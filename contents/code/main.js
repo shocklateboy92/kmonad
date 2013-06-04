@@ -8,7 +8,7 @@ print(workspace.clientArea(workspace.MaximizeArea,workspace.activeScreen,workspa
 //     relayout(workspace.activeScreen,workspace.currentDesktop);
 // });
 
-var screenGeom = workspace.clientArea(workspace.MaximizeArea,workspace.activeScreen,workspace.currentDesktop);
+
 var potentialClients = workspace.clientList();
 var allClients = new Array();
 for (w in potentialClients) {
@@ -30,10 +30,13 @@ for (d in allClients) {
     }
 }
 
-// function relayout(screen,desktop){
-//     tallMode(clients,screenGeom);
-// }
-//
+relayout(workspace.activeScreen, workspace.currentDesktop);
+
+function relayout(screen, desktop) {
+    var screenGeom = workspace.clientArea(workspace.MaximizeArea, screen, desktop);
+    tallMode(allClients[desktop], screenGeom);
+}
+
 // function spiral(clients,geom) {
 //     if(clients.length > 0) {
 //         var wnd = clients.shift();
@@ -55,26 +58,26 @@ for (d in allClients) {
 // // spiral(clients, screenGeom);
 //
 // //tallMode(clients, screenGeom);
-//
-//
-// function tallMode(clients, geom) {
-//     var main = clients.shift();
-//     print(main.caption);
-//     mainGeom = geom;
-//     mainGeom.width = geom.width / 2;
-//     main.geometry = mainGeom;
-//     mainGeom.x += mainGeom.width;
-//     stackVertically(clients, mainGeom);
-// }
-//
-// function stackVertically(clients, geom) {
-//     var height = geom.height / clients.length;
-//     var vOffset = geom.y;
-//
-//     for (w in clients) {
-//         geom.y = (height * w) + vOffset;
-//         geom.height = height;
-//
-//         clients[w].geometry = geom;
-//     }
-// }
+
+
+function tallMode(clients, geom) {
+    var main = clients.shift();
+    print(main.caption);
+    mainGeom = geom;
+    mainGeom.width = geom.width / 2;
+    main.geometry = mainGeom;
+    mainGeom.x += mainGeom.width;
+    stackVertically(clients, mainGeom);
+}
+
+function stackVertically(clients, geom) {
+    var height = geom.height / clients.length;
+    var vOffset = geom.y;
+
+    for (w in clients) {
+        geom.y = (height * w) + vOffset;
+        geom.height = height;
+
+        clients[w].geometry = geom;
+    }
+}
