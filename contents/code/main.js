@@ -3,10 +3,10 @@
 print(workspace.clientArea(workspace.MaximizeArea,workspace.activeScreen,workspace.currentDesktop).width);
 print(workspace.clientArea(workspace.MaximizeArea,workspace.activeScreen,workspace.currentDesktop).height);
 
-// registerShortcut("Retile Windows", "Forces Kmonad to recalculate window positions", "Meta+U", function() {
-//     print("cvg");
-//     relayout(workspace.activeScreen,workspace.currentDesktop);
-// });
+registerShortcut("Retile Windows", "Forces Kmonad to recalculate window positions", "Meta+U", function() {
+    print("cvg");
+    relayout(workspace.activeScreen,workspace.currentDesktop);
+});
 
 
 var potentialClients = workspace.clientList();
@@ -77,7 +77,6 @@ function stackVertically(clients, geom) {
     for (w in clients) {
         geom.y = (height * w) + vOffset;
         geom.height = height;
-
         clients[w].geometry = geom;
     }
 }
