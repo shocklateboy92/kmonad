@@ -25,6 +25,12 @@ for (w in potentialClients) {
 
 printList();
 
+workspace.clientMinimized.connect(function() {
+
+});
+
+
+
 workspace.clientAdded.connect(function() {
     print(client.windowId + "added to the list");
     addNewClient(client);
@@ -75,7 +81,7 @@ function relayout(screen, desktop) {
 
 
 function tallMode(clients, geom) {
-    var remainingClients = clients;
+    var remainingClients = clients.slice(0);
     var main = remainingClients.shift();
     print(main.caption);
     mainGeom = geom;
