@@ -4,36 +4,50 @@ print(workspace.clientArea(workspace.MaximizeArea,workspace.activeScreen,workspa
 print(workspace.clientArea(workspace.MaximizeArea,workspace.activeScreen,workspace.currentDesktop).height);
 
 registerShortcut("Retile Windows", "Forces Kmonad to recalculate window positions", "Meta+U", function() {
-    print("cvg");
+    printList();
     relayout(workspace.activeScreen,workspace.currentDesktop);
 });
 
+function printList() {
+    print("Layout List");
+    for (d in allClients) {
+        for (e in allClients[d]) {
+            print (d + " : " + allClients[d][e].caption);
+        }
+    }
+}
 
 var potentialClients = workspace.clientList();
 var allClients = new Array();
 for (w in potentialClients) {
-    var pc = potentialClients[w];
+    addNewClient(potentialClients[w]);
+}
 
-    if (!pc.specialWindow) {
+printList();
+
+workspace.clientAdded.connect(function() {
+    print(client.windowId + "added to the list");
+    addNewClient(client);
+});
+
+
+
+function addNewClient(pc) {
+    if (pc.specialWindow) {
+        print("Skipping special window '" + pc.caption + "'");
+        return;
+    } else {
         if (typeof(allClients[pc.desktop]) == 'undefined') {
             allClients[pc.desktop] = Array();
         }
         allClients[pc.desktop].push(pc);
-    } else {
-        print("Skipping special window '" + pc.caption + "'");
+        printList();
     }
 }
-
-for (d in allClients) {
-    for (e in allClients[d]) {
-        print (d + " : " + allClients[d][e].caption);
-    }
-}
-
-relayout(workspace.activeScreen, workspace.currentDesktop);
 
 function relayout(screen, desktop) {
     var screenGeom = workspace.clientArea(workspace.MaximizeArea, screen, desktop);
+
     tallMode(allClients[desktop], screenGeom);
 }
 
