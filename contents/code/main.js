@@ -61,13 +61,14 @@ function relayout(screen, desktop) {
 
 
 function tallMode(clients, geom) {
-    var main = clients.shift();
+    var remainingClients = clients;
+    var main = remainingClients.shift();
     print(main.caption);
     mainGeom = geom;
     mainGeom.width = geom.width / 2;
     main.geometry = mainGeom;
     mainGeom.x += mainGeom.width;
-    stackVertically(clients, mainGeom);
+    stackVertically(remainingClients, mainGeom);
 }
 
 function stackVertically(clients, geom) {
