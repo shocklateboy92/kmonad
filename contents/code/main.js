@@ -18,7 +18,7 @@ function printList() {
 }
 
 var potentialClients = workspace.clientList();
-var allClients = new Array();
+var allClients = [];
 for (w in potentialClients) {
     addNewClient(potentialClients[w]);
 }
@@ -31,12 +31,15 @@ workspace.clientMinimized.connect(function() {
 
 
 
-workspace.clientAdded.connect(function() {
-    print(client.windowId + "added to the list");
+workspace.clientAdded.connect(function(client) {
+    print("Window '" + client.caption + "' added to the workspace");
     addNewClient(client);
 });
 
-
+workspace.clientRemoved.connect(function(client) {
+    print("Window '" + client.caption + "' removed from workspace");
+    removeClient(client);
+});
 
 function addNewClient(pc) {
     if (pc.specialWindow) {
@@ -44,17 +47,24 @@ function addNewClient(pc) {
         return;
     } else {
         if (typeof(allClients[pc.desktop]) == 'undefined') {
-            allClients[pc.desktop] = Array();
+            allClients[pc.desktop] = [];
         }
         allClients[pc.desktop].push(pc);
         printList();
     }
 }
 
+function removeClient(ec) {
+    var index = allClients[ec.desktop].indexOf(ec);
+    if (index !== -1) {
+        allClients[ec.desktop].splice(index, 1);
+    }
+}
+
 function relayout(screen, desktop) {
     var screenGeom = workspace.clientArea(workspace.MaximizeArea, screen, desktop);
 
-    tallMode(allClients[desktop], screenGeom);
+//    tallMode(allClients[desktop], screenGeom);
 }
 
 // function spiral(clients,geom) {
