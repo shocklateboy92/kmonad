@@ -55,6 +55,55 @@ function ClientList() {
     }
 }
 
+/********************* TILING FUNCTIONS *********************/
+
+function spiral(clients,geom) {
+    if(clients.length > 0) {
+        var wnd = clients.shift();
+        print(wnd.caption + ":" + wnd.windowRole);
+        if (wnd.windowRole !== "panel_1" ) {
+            if (geom.width > geom.height) {
+                geom.width = (geom.width/2);
+                wnd.geometry = geom;
+                geom.x = geom.x + wnd.width;
+            } else {
+                geom.height = (geom.height/2);
+                wnd.geometry = geom;
+                geom.y = geom.y + wnd.height;
+            }
+        }
+        spiral(clients,geom);
+    }
+}
+
+function stackVertically(clients, geom) {
+    var height = geom.height / clients.length;
+    var vOffset = geom.y;
+
+    for (w in clients) {
+        geom.y = (height * w) + vOffset;
+        geom.height = height;
+        clients[w].geometry = geom;
+    }
+}
+
+function tallMode(clients, geom) {
+    var remainingClients = clients.slice(0);
+    var main = remainingClients.shift();
+    print(main.caption);
+    mainGeom = geom;
+    mainGeom.width = geom.width / 2;
+    main.geometry = mainGeom;
+    mainGeom.x += mainGeom.width;
+    stackVertically(remainingClients, mainGeom);
+}
+
+function relayout(screen, desktop) {
+    var screenGeom = workspace.clientArea(workspace.MaximizeArea, screen, desktop);
+
+//    tallMode(allClients[desktop], screenGeom);
+}
+
 /************************** SET UP **************************/
 
 registerShortcut("Retile Windows",
@@ -84,56 +133,3 @@ workspace.clientRemoved.connect(function(client) {
 var managedClients = new ClientList();
 managedClients.repopulateList();
 managedClients.printAllClients();
-
-
-
-//function relayout(screen, desktop) {
-//    var screenGeom = workspace.clientArea(workspace.MaximizeArea, screen, desktop);
-
-////    tallMode(allClients[desktop], screenGeom);
-//}
-
-//// function spiral(clients,geom) {
-////     if(clients.length > 0) {
-////         var wnd = clients.shift();
-////         print(wnd.caption + ":" + wnd.windowRole);
-////         if (wnd.windowRole != "panel_1" ) {
-////             if (geom.width > geom.height) {
-////                 geom.width = (geom.width/2);
-////                 wnd.geometry = geom;
-////                 geom.x = geom.x + wnd.width;
-////             } else{
-////                 geom.height = (geom.height/2);
-////                 wnd.geometry = geom;
-////                 geom.y = geom.y + wnd.height;
-////             }
-////         }
-////         spiral(clients,geom);
-////     }
-//// }
-//// // spiral(clients, screenGeom);
-////
-//// //tallMode(clients, screenGeom);
-
-
-//function tallMode(clients, geom) {
-//    var remainingClients = clients.slice(0);
-//    var main = remainingClients.shift();
-//    print(main.caption);
-//    mainGeom = geom;
-//    mainGeom.width = geom.width / 2;
-//    main.geometry = mainGeom;
-//    mainGeom.x += mainGeom.width;
-//    stackVertically(remainingClients, mainGeom);
-//}
-
-//function stackVertically(clients, geom) {
-//    var height = geom.height / clients.length;
-//    var vOffset = geom.y;
-
-//    for (w in clients) {
-//        geom.y = (height * w) + vOffset;
-//        geom.height = height;
-//        clients[w].geometry = geom;
-//    }
-//}
