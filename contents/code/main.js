@@ -1,8 +1,12 @@
 
 /*********************** DEBUG OUTPUT ***********************/
 
-print(workspace.clientArea(workspace.MaximizeArea,workspace.activeScreen,workspace.currentDesktop).width);
-print(workspace.clientArea(workspace.MaximizeArea,workspace.activeScreen,workspace.currentDesktop).height);
+print(workspace.clientArea(workspace.MaximizeArea,
+                           workspace.activeScreen,
+                           workspace.currentDesktop).width);
+print(workspace.clientArea(workspace.MaximizeArea,
+                           workspace.activeScreen,
+                           workspace.currentDesktop).height);
 
 /****************** CLIENTS LIST FUNCTIONS ******************/
 
@@ -20,9 +24,17 @@ function ClientList() {
         }
     }
 
-    this.addClient = function(pc) {
+    this.shouldIgnore = function(pc) {
         if (pc.specialWindow) {
-            print("Skipping special window '" + pc.caption + "'");
+            return true;
+        }
+
+        return false;
+    }
+
+    this.addClient = function(pc) {
+        if (this.shouldIgnore(pc)) {
+            print("Ignoring special window '" + pc.caption + "'");
             return;
         } else {
             /* In case this is the first window of desktop/screen,
@@ -40,9 +52,14 @@ function ClientList() {
     }
 
     this.removeClient = function(ec) {
-        var index = this.__all_clients[ec.desktop][ec.screen].indexOf(ec);
-        if (index !== -1) {
-            this.__all_clients[ec.desktop][ec.screen].splice(index, 1);
+        if (this.shouldIgnore(ec)) {
+            print("Ignoring special window '" + ec.caption + "'");
+            return;
+        } else {
+            var index = this.__all_clients[ec.desktop][ec.screen].indexOf(ec);
+            if (index !== -1) {
+                this.__all_clients[ec.desktop][ec.screen].splice(index, 1);
+            }
         }
     }
 
@@ -52,6 +69,16 @@ function ClientList() {
         for (w in potentialClients) {
             this.addClient(potentialClients[w]);
         }
+    }
+
+    this.clientsToTileOn = function(desktop, screen) {
+        var newList = [];
+        for (client in this.__all_clients[desktop][screen]) {
+            if (!client.minimized) {
+                newList.push(client);
+            }
+        }
+        return newList;
     }
 }
 
@@ -88,20 +115,22 @@ function stackVertically(clients, geom) {
 }
 
 function tallMode(clients, geom) {
-    var remainingClients = clients.slice(0);
-    var main = remainingClients.shift();
-    print(main.caption);
+    var mainClient = remainingClients.shift();
+    //print(mainClient.caption);
     mainGeom = geom;
     mainGeom.width = geom.width / 2;
-    main.geometry = mainGeom;
+    mainClient.geometry = mainGeom;
     mainGeom.x += mainGeom.width;
     stackVertically(remainingClients, mainGeom);
 }
 
-function relayout(screen, desktop) {
-    var screenGeom = workspace.clientArea(workspace.MaximizeArea, screen, desktop);
+function relayout(desktop, screen) {
+    var screenGeom = workspace.clientArea(workspace.MaximizeArea,
+                                          screen, desktop);
 
 //    tallMode(allClients[desktop], screenGeom);
+    var clientsToTile = managedClients.clientsToTileOn(desktop, screen);
+    tallMode(clientsToTile, screenGeom);
 }
 
 /************************** SET UP **************************/
