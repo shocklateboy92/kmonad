@@ -73,7 +73,9 @@ function ClientList() {
 
     this.clientsToTileOn = function(desktop, screen) {
         var newList = [];
-        for (client in this.__all_clients[desktop][screen]) {
+        for (i in this.__all_clients[desktop][screen]) {
+            var client = this.__all_clients[desktop][screen][i];
+
             if (!client.minimized) {
                 newList.push(client);
             }
@@ -115,21 +117,22 @@ function stackVertically(clients, geom) {
 }
 
 function tallMode(clients, geom) {
-    var mainClient = remainingClients.shift();
-    //print(mainClient.caption);
+    var mainClient = clients.shift();
+    print(mainClient.caption);
     mainGeom = geom;
     mainGeom.width = geom.width / 2;
     mainClient.geometry = mainGeom;
     mainGeom.x += mainGeom.width;
-    stackVertically(remainingClients, mainGeom);
+    stackVertically(clients, mainGeom);
 }
 
 function relayout(desktop, screen) {
     var screenGeom = workspace.clientArea(workspace.MaximizeArea,
                                           screen, desktop);
-
-//    tallMode(allClients[desktop], screenGeom);
     var clientsToTile = managedClients.clientsToTileOn(desktop, screen);
+
+
+    print ("#YOLO #SWAG!")
     tallMode(clientsToTile, screenGeom);
 }
 
@@ -140,8 +143,8 @@ registerShortcut("Retile Windows",
                  "Meta+U",
                  function() {
                      managedClients.repopulateList();
-                     relayout(workspace.activeScreen,
-                              workspace.currentDesktop);
+                     relayout(workspace.currentDesktop,
+                              workspace.activeScreen);
                  });
 
 
@@ -150,11 +153,15 @@ registerShortcut("Retile Windows",
 workspace.clientAdded.connect(function(client) {
     print("Window '" + client.caption + "' added to the workspace");
     managedClients.addClient(client);
+    relayout(client.desktop,
+             client.screen);
 });
 
 workspace.clientRemoved.connect(function(client) {
     print("Window '" + client.caption + "' removed from workspace");
     managedClients.removeClient(client);
+    relayout(client.desktop,
+             client.screen);
 });
 
 /************************** START ***************************/
