@@ -117,13 +117,23 @@ function stackVertically(clients, geom) {
 }
 
 function tallMode(clients, geom) {
-    var mainClient = clients.shift();
-    print(mainClient.caption);
-    mainGeom = geom;
-    mainGeom.width = geom.width / 2;
-    mainClient.geometry = mainGeom;
-    mainGeom.x += mainGeom.width;
-    stackVertically(clients, mainGeom);
+    if (clients.length === 0) {
+        return;
+    }
+    if (clients.lenght === 1) {
+        clients[0].geometry = geom;
+        return;
+    } else {
+        var mainClient = clients.shift();
+
+        mainGeom = geom;
+        mainGeom.width = geom.width / 2;
+
+        mainClient.geometry = mainGeom;
+        mainGeom.x += mainGeom.width;
+
+        stackVertically(clients, mainGeom);
+    }
 }
 
 function relayout(desktop, screen) {
@@ -131,8 +141,6 @@ function relayout(desktop, screen) {
                                           screen, desktop);
     var clientsToTile = managedClients.clientsToTileOn(desktop, screen);
 
-
-    print ("#YOLO #SWAG!")
     tallMode(clientsToTile, screenGeom);
 }
 
