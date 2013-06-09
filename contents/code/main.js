@@ -120,20 +120,20 @@ function tallMode(clients, geom) {
     if (clients.length === 0) {
         return;
     }
-    if (clients.lenght === 1) {
+    if (clients.length === 1) {
         clients[0].geometry = geom;
         return;
-    } else {
-        var mainClient = clients.shift();
-
-        mainGeom = geom;
-        mainGeom.width = geom.width / 2;
-
-        mainClient.geometry = mainGeom;
-        mainGeom.x += mainGeom.width;
-
-        stackVertically(clients, mainGeom);
     }
+
+    var mainClient = clients.shift();
+
+    mainGeom = geom;
+    mainGeom.width = geom.width / 2;
+
+    mainClient.geometry = mainGeom;
+    mainGeom.x += mainGeom.width;
+
+    stackVertically(clients, mainGeom);
 }
 
 function relayout(desktop, screen) {
@@ -170,6 +170,14 @@ workspace.clientRemoved.connect(function(client) {
     managedClients.removeClient(client);
     relayout(client.desktop,
              client.screen);
+});
+
+workspace.clientMinimized.connect(function(client) {
+    relayout(client.desktop, client.screen);
+});
+
+workspace.clientUnminimized.connect(function(client) {
+    relayout(client.desktop, client.screen);
 });
 
 /************************** START ***************************/
