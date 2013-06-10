@@ -24,7 +24,12 @@ function ClientList() {
     }
 
     this.shouldIgnore = function(pc) {
-        if (pc.specialWindow) {
+        if (!pc.normalWindow) {
+            return true;
+        }
+
+        // to avoid things like Yakuake
+        if (pc.skipPager || pc.skipTaskbar) {
             return true;
         }
 
