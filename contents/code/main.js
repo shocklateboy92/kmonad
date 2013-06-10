@@ -187,7 +187,7 @@ function spiral(clients, geom) {
     if(clients.length === 0 ) {
       return;
     }
-    if(clients.length === 1){
+    if(clients.length === 1) {
       clients[0].geometry = geom;
       return;
     }
@@ -210,7 +210,7 @@ function stackHorizontally(clients, geom) {
     var width = geom.width / clients.length;
     var hOffset = geom.x;
 
-    for (w in clients){
+    for (w in clients) {
         geom.x = (width * w) + hOffset;
         geom.width = width;
         clients[w].geometry = geom;
@@ -218,10 +218,10 @@ function stackHorizontally(clients, geom) {
 }
 
 function wideMode(clients, geom) {
-    if (clients.length === 0){
+    if (clients.length === 0) {
         return;
     }
-    if (clients.length === 1){
+    if (clients.length === 1) {
         clients[0].geometry = geom;
         return;
     }
