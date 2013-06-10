@@ -11,7 +11,7 @@ print(workspace.clientArea(workspace.MaximizeArea,
 /****************** CLIENTS LIST FUNCTIONS ******************/
 
 function ClientList() {
-    this.__all_clients = [];
+    var __all_clients = [];
 
     this.printAllClients = function() {
         for (desktop in this.__all_clients) {
@@ -37,18 +37,55 @@ function ClientList() {
             print("Ignoring special window '" + pc.caption + "'");
             return;
         } else {
-            /* In case this is the first window of desktop/screen,
-             * initialize the appropriate sublist.
-             */
-            if (typeof(this.__all_clients[pc.desktop]) == 'undefined') {
-                this.__all_clients[pc.desktop] = [];
-            }
-            if (typeof(this.__all_clients[pc.desktop][pc.screen]) == 'undefined') {
-                this.__all_clients[pc.desktop][pc.screen] = [];
-            }
+            __push_client(pc, pc.desktop, pc.screen);
 
-            this.__all_clients[pc.desktop][pc.screen].push(pc);
+            var handler = {
+                client: pc,
+                list: this.__all_clients,
+                prevDesktop: pc.desktop,
+                prevScreen: pc.screen,
+                updateLocation: function() {
+                    var prevList = this.list[this.prevDesktop][this.prevScreen];
+                    var index = prevList.indexOf(this.client);
+
+                    if (index === -1) {
+                        print("ERROR: client doesn't exist in previous screen!");
+                    } else {
+                        prevList.splice(index, 1);
+                    }
+
+                    var newList =
+                            this.list[this.client.desktop][this.client.screen];
+                    __push_client(this.client);
+
+                    relayout(this.prevDesktop, this.prevScreen);
+                    relayout(this.client.desktop, this.client.screen);
+
+                    this.prevDesktop = this.client.desktop;
+                    this.prevScreen  = this.client.screen;
+                }
+            };
+
+            pc.desktopChanged.connect(handler, 'updateLocation');
+            if (pc.screenChanged !== undefined) {
+                // It seems this signal is only available in KWin 4.11
+                pc.screenChanged.connect(handler, 'updateLocation');
+            }
         }
+    }
+
+    function __push_client(client, desktop, screen) {
+        /* In case this is the first window of desktop/screen,
+         * initialize the appropriate sublist.
+         */
+        if (typeof(__all_clients[desktop]) == 'undefined') {
+            __all_clients[desktop] = [];
+        }
+        if (typeof(__all_clients[desktop][screen]) == 'undefined') {
+            __all_clients[desktop][screen] = [];
+        }
+
+        __all_clients[desktop][screen].push(client);
     }
 
     this.removeClient = function(ec) {
