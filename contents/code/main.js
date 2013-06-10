@@ -41,7 +41,7 @@ function ClientList() {
             print("Ignoring special window '" + pc.caption + "'");
             return;
         } else {
-            __push_client(pc, pc.desktop, pc.screen);
+            __get_list(pc.desktop, pc.screen).push(pc);
 
             var handler = {
                 client: pc,
@@ -49,7 +49,7 @@ function ClientList() {
                 prevDesktop: pc.desktop,
                 prevScreen: pc.screen,
                 updateLocation: function() {
-                    var prevList = this.list[this.prevDesktop][this.prevScreen];
+                    var prevList = __get_list(this.prevDesktop,this.prevScreen);
                     var index = prevList.indexOf(this.client);
 
                     if (index === -1) {
@@ -58,9 +58,8 @@ function ClientList() {
                         prevList.splice(index, 1);
                     }
 
-                    __push_client(this.client,
-                                  this.client.desktop,
-                                  this.client.screen);
+                    __get_list(this.client.desktop,
+                               this.client.screen).push(this.client);
 
                     relayout(this.prevDesktop, this.prevScreen);
                     __delayed_relayout(this.client.desktop,
@@ -79,7 +78,7 @@ function ClientList() {
         }
     }
 
-    // Massive HACK to get around a bug in KWin
+    // Slight HACK to get around a bug in KWin
     function __delayed_relayout(desktop, screen) {
         var timer = new QTimer();
         timer.interval = 0;
@@ -90,7 +89,7 @@ function ClientList() {
         timer.start();
     }
 
-    function __push_client(client, desktop, screen) {
+    function __get_list(desktop, screen) {
         /* In case this is the first window of desktop/screen,
          * initialize the appropriate sublist.
          */
@@ -101,7 +100,7 @@ function ClientList() {
             __all_clients[desktop][screen] = [];
         }
 
-        __all_clients[desktop][screen].push(client);
+        return __all_clients[desktop][screen];
     }
 
     this.removeClient = function(ec) {
@@ -109,7 +108,7 @@ function ClientList() {
             print("Ignoring special window '" + ec.caption + "'");
             return;
         } else {
-            var index = __all_clients[ec.desktop][ec.screen].indexOf(ec);
+            var index = __get_list(ec.desktop, ec.screen).indexOf(ec);
             if (index !== -1) {
                 __all_clients[ec.desktop][ec.screen].splice(index, 1);
             }
@@ -127,13 +126,10 @@ function ClientList() {
     this.clientsToTileOn = function(desktop, screen) {
         var newList = [];
 
-        if (__all_clients[desktop] === undefined ||
-                __all_clients[desktop][screen] === undefined) {
-            return newList;
-        }
+        var clients = __get_list(desktop, screen);
 
-        for (i in __all_clients[desktop][screen]) {
-            var client = __all_clients[desktop][screen][i];
+        for (i in clients) {
+            var client = clients[i];
 
             if (!client.minimized) {
                 newList.push(client);
