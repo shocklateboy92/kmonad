@@ -14,12 +14,11 @@ function ClientList() {
     var __all_clients = [];
 
     this.printAllClients = function() {
-        for (desktop in this.__all_clients) {
-            for (screen in this.__all_clients[desktop]) {
-                for (client in this.__all_clients[desktop][screen])
+        for (desktop in __all_clients) {
+            for (screen in __all_clients[desktop]) {
+                for (client in __all_clients[desktop][screen])
                 print("\t(" + desktop + "," + screen + "): '" +
-                      this.__all_clients[desktop][screen][client].caption +
-                      "'");
+                      __all_clients[desktop][screen][client].caption + "'");
             }
         }
     }
@@ -41,7 +40,7 @@ function ClientList() {
 
             var handler = {
                 client: pc,
-                list: this.__all_clients,
+                list: __all_clients,
                 prevDesktop: pc.desktop,
                 prevScreen: pc.screen,
                 updateLocation: function() {
@@ -54,9 +53,9 @@ function ClientList() {
                         prevList.splice(index, 1);
                     }
 
-                    var newList =
-                            this.list[this.client.desktop][this.client.screen];
-                    __push_client(this.client);
+                    __push_client(this.client,
+                                  this.client.desktop,
+                                  this.client.screen);
 
                     relayout(this.prevDesktop, this.prevScreen);
                     relayout(this.client.desktop, this.client.screen);
@@ -93,15 +92,15 @@ function ClientList() {
             print("Ignoring special window '" + ec.caption + "'");
             return;
         } else {
-            var index = this.__all_clients[ec.desktop][ec.screen].indexOf(ec);
+            var index = __all_clients[ec.desktop][ec.screen].indexOf(ec);
             if (index !== -1) {
-                this.__all_clients[ec.desktop][ec.screen].splice(index, 1);
+                __all_clients[ec.desktop][ec.screen].splice(index, 1);
             }
         }
     }
 
     this.repopulateList = function() {
-        this.__all_clients = [];
+        __all_clients = [];
         var potentialClients = workspace.clientList();
         for (w in potentialClients) {
             this.addClient(potentialClients[w]);
@@ -110,8 +109,14 @@ function ClientList() {
 
     this.clientsToTileOn = function(desktop, screen) {
         var newList = [];
-        for (i in this.__all_clients[desktop][screen]) {
-            var client = this.__all_clients[desktop][screen][i];
+
+        if (__all_clients[desktop] === undefined ||
+                __all_clients[desktop][screen] === undefined) {
+            return newList;
+        }
+
+        for (i in __all_clients[desktop][screen]) {
+            var client = __all_clients[desktop][screen][i];
 
             if (!client.minimized) {
                 newList.push(client);
@@ -164,7 +169,7 @@ function tallMode(clients, geom) {
 
     var mainClient = clients.shift();
 
-    mainGeom = geom;
+    var mainGeom = geom;
     mainGeom.width = geom.width / 2;
 
     mainClient.geometry = mainGeom;
