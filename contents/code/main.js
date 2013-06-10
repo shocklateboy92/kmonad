@@ -58,7 +58,8 @@ function ClientList() {
                                   this.client.screen);
 
                     relayout(this.prevDesktop, this.prevScreen);
-                    relayout(this.client.desktop, this.client.screen);
+                    __delayed_relayout(this.client.desktop,
+                                       this.client.screen);
 
                     this.prevDesktop = this.client.desktop;
                     this.prevScreen  = this.client.screen;
@@ -71,6 +72,17 @@ function ClientList() {
                 pc.screenChanged.connect(handler, 'updateLocation');
             }
         }
+    }
+
+    // Massive HACK to get around a bug in KWin
+    function __delayed_relayout(desktop, screen) {
+        var timer = new QTimer();
+        timer.interval = 0;
+        timer.singleShot = true;
+        timer.timeout.connect(function(){
+            relayout(desktop, screen);
+        });
+        timer.start();
     }
 
     function __push_client(client, desktop, screen) {
