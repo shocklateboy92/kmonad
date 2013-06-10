@@ -202,10 +202,40 @@ function spiral(clients, geom) {
                 wnd.geometry = geom;
                 geom.y = geom.y + wnd.height;
             }
-        }
+        
         spiral(clients,geom);
     }
+
+function stackHorizontally(clients, geom) {
+    var width = geom.width / clients.length;
+    var hOffset = geom.x;
+
+    for (w in clients){
+        geom.x = (width * w) + hOffset;
+        geom.width = width;
+        clients[w].geometry = geom;
+    }
 }
+
+function wideMode(clients, geom) {
+    if (clients.length === 0){
+        return;
+    }
+    if (clients.length === 1){
+        clients[0].geometry = geom;
+        return;
+    }
+    var mainClient = clients.shift();
+
+    var mainGeom = geom;
+    mainGeom.height = geom.height / 2;
+
+    mainClient.geometry = mainGeom;
+    mainGeom.y += mainGeom.height;
+
+    stackHorizontally(clients, mainGeom);
+}
+
 
 function stackVertically(clients, geom) {
     var height = geom.height / clients.length;
