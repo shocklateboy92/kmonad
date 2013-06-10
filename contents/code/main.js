@@ -186,6 +186,14 @@ function relayout(desktop, screen) {
     tallMode(clientsToTile, screenGeom);
 }
 
+function relayoutAll() {
+    for (var desktop = 0; desktop < workspace.desktops; desktop++) {
+        for (var screen = 0; screen < workspace.numScreens; screen++) {
+            relayout(desktop, screen);
+        }
+    }
+}
+
 /************************** SET UP **************************/
 
 registerShortcut("Retile Windows",
