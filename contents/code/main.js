@@ -183,11 +183,16 @@ function ClientList() {
 
 /********************* TILING FUNCTIONS *********************/
 
-function spiral(clients,geom) {
-    if(clients.length > 0) {
+function spiral(clients, geom) {
+    if(clients.length === 0 ) {
+      return;
+    }
+    if(clients.length === 1){
+      clients[0].geometry = geom;
+      return;
+    }
         var wnd = clients.shift();
-        print(wnd.caption + ":" + wnd.windowRole);
-        if (wnd.windowRole !== "panel_1" ) {
+        
             if (geom.width > geom.height) {
                 geom.width = (geom.width/2);
                 wnd.geometry = geom;
@@ -238,6 +243,10 @@ function relayout(desktop, screen) {
                                           screen, desktop);
     var clientsToTile = managedClients.clientsToTileOn(desktop, screen);
 
+    //spiral(clientsToTile, screenGeom);
+
+    //wideMode(clientsToTile, screenGeom);
+    
     tallMode(clientsToTile, screenGeom);
 }
 
