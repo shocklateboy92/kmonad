@@ -137,6 +137,48 @@ function ClientList() {
         }
         return newList;
     }
+
+    function __current_list() {
+        return __get_list(workspace.currentDesktop,
+                          workspace.activeScreen);
+    }
+
+    this.swapMaster = function() {
+        var clients = __current_list();
+        var index = clients.indexOf(workspace.activeClient);
+        if (index === -1) {
+            print("ERROR: Active client not on screen!");
+            return;
+        }
+
+        if (index !== 0) {
+            var prevMaster = clients[0];
+            clients[0] = clients[index];
+            clients[index] = prevMaster;
+        }
+    }
+
+    this.moveActive = function(offset) {
+        var clients = __current_list();
+        var index = clients.indexOf(workspace.activeClient);
+        if (index === -1) {
+            print("ERROR: Active client not on screen!");
+            return;
+        }
+
+        var newIndex = index + offset;
+
+        if (newIndex < 0) {
+            newIndex += clients.length;
+        }
+        if (newIndex >= clients.length) {
+            newIndex -= clients.length;
+        }
+
+        var old = clients[index];
+        clients[index] = clients[newIndex];
+        clients[newIndex] = old;
+    }
 }
 
 /********************* TILING FUNCTIONS *********************/
@@ -218,6 +260,32 @@ registerShortcut("Retile Windows",
                               workspace.activeScreen);
                  });
 
+registerShortcut("Swap Master Window",
+                 "Swap the current window with the master window",
+                 "Meta+Return",
+                 function() {
+                     managedClients.swapMaster();
+                     relayout(workspace.currentDesktop,
+                              workspace.activeScreen);
+                 });
+
+registerShortcut("Move Window Up",
+                 "Swap current window with the one before it",
+                 "Meta+Shift+K",
+                 function() {
+                     managedClients.moveActive(-1);
+                     relayout(workspace.currentDesktop,
+                              workspace.activeScreen);
+                 });
+
+registerShortcut("Move Window Down",
+                 "Swap current window with the one after it",
+                 "Meta+Shift+J",
+                 function() {
+                     managedClients.moveActive(1);
+                     relayout(workspace.currentDesktop,
+                              workspace.activeScreen);
+                 });
 
 /**************** WORK-SPACE SIGNAL HANDLERS ****************/
 
