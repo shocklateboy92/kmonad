@@ -316,3 +316,5 @@ workspace.clientUnminimized.connect(function(client) {
 var managedClients = new ClientList();
 managedClients.repopulateList();
 managedClients.printAllClients();
+
+relayoutAll();
