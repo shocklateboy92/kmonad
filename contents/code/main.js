@@ -183,29 +183,103 @@ function ClientList() {
 
 /********************* TILING FUNCTIONS *********************/
 
-function spiral(clients, geom) {
-    if (clients.length === 0 ) {
-        return;
-    }
-    if (clients.length === 1) {
-        clients[0].geometry = geom;
-        return;
-    }
-    var wnd = clients.shift();
+function ConfigsList() {
 
-    if (geom.width > geom.height) {
-        geom.width = (geom.width/2);
-        wnd.geometry = geom;
-        geom.x = geom.x + wnd.width;
-    } else {
-        geom.height = (geom.height/2);
-        wnd.geometry = geom;
-        geom.y = geom.y + wnd.height;
+    function Config() {
+        this.primaryWindows = 1;
+        this.primaryWindowSizeRatio = 0.5;
+        this.tile = __tilers[0];
+
+        this.cycleTiler = function() {
+            var index = __tilers.indexOf(this.tile);
+            print("tyler was " + __tilers[index]);
+            this.tile = __tilers[(index + 1) % __tilers.length];
+            print("tyler is " + this.tile);
+        }
     }
 
-    spiral(clients,geom);
+    var __all_confs = [];
+
+    function __get_conf(desktop, screen) {
+        /* Lazily create configs as necessary */
+        if (__all_confs[desktop] === undefined) {
+            __all_confs[desktop] = [];
+        }
+        if (__all_confs[desktop][screen] === undefined) {
+            __all_confs[desktop][screen] = new Config();
+        }
+
+        return __all_confs[desktop][screen];
+    }
+
+    this.getConfig = function(desktop, screen) {
+        return __get_conf(desktop, screen);
+    }
+
+    var __tilers = [
+        function tallMode(clients, geom) {
+            if (clients.length === 0) {
+                return;
+            }
+            if (clients.length === 1) {
+                clients[0].geometry = geom;
+                return;
+            }
+
+            var mainClient = clients.shift();
+
+            var mainGeom = geom;
+            mainGeom.width = geom.width / 2;
+
+            mainClient.geometry = mainGeom;
+            mainGeom.x += mainGeom.width;
+
+            stackVertically(clients, mainGeom);
+        },
+        function wideMode(clients, geom) {
+            if (clients.length === 0) {
+                return;
+            }
+            if (clients.length === 1) {
+                clients[0].geometry = geom;
+                return;
+            }
+            var mainClient = clients.shift();
+
+            var mainGeom = geom;
+            mainGeom.height = geom.height / 2;
+
+            mainClient.geometry = mainGeom;
+            mainGeom.y += mainGeom.height;
+
+            stackHorizontally(clients, mainGeom);
+        },
+        function spiral(clients, geom) {
+            if (clients.length === 0 ) {
+                return;
+            }
+            if (clients.length === 1) {
+                clients[0].geometry = geom;
+                return;
+            }
+            var wnd = clients.shift();
+
+            if (geom.width > geom.height) {
+                geom.width = (geom.width/2);
+                wnd.geometry = geom;
+                geom.x = geom.x + wnd.width;
+            } else {
+                geom.height = (geom.height/2);
+                wnd.geometry = geom;
+                geom.y = geom.y + wnd.height;
+            }
+
+            spiral(clients,geom);
+    }];
 }
 
+// Helper functions
+// TODO: merge them into appropriate places
 function stackHorizontally(clients, geom) {
     var width = geom.width / clients.length;
     var hOffset = geom.x;
@@ -216,26 +290,6 @@ function stackHorizontally(clients, geom) {
         clients[w].geometry = geom;
     }
 }
-
-function wideMode(clients, geom) {
-    if (clients.length === 0) {
-        return;
-    }
-    if (clients.length === 1) {
-        clients[0].geometry = geom;
-        return;
-    }
-    var mainClient = clients.shift();
-
-    var mainGeom = geom;
-    mainGeom.height = geom.height / 2;
-
-    mainClient.geometry = mainGeom;
-    mainGeom.y += mainGeom.height;
-
-    stackHorizontally(clients, mainGeom);
-}
-
 
 function stackVertically(clients, geom) {
     var height = geom.height / clients.length;
@@ -248,36 +302,14 @@ function stackVertically(clients, geom) {
     }
 }
 
-function tallMode(clients, geom) {
-    if (clients.length === 0) {
-        return;
-    }
-    if (clients.length === 1) {
-        clients[0].geometry = geom;
-        return;
-    }
-
-    var mainClient = clients.shift();
-
-    var mainGeom = geom;
-    mainGeom.width = geom.width / 2;
-
-    mainClient.geometry = mainGeom;
-    mainGeom.x += mainGeom.width;
-
-    stackVertically(clients, mainGeom);
-}
-
 function relayout(desktop, screen) {
     var screenGeom = workspace.clientArea(workspace.MaximizeArea,
                                           screen, desktop);
     var clientsToTile = managedClients.clientsToTileOn(desktop, screen);
 
-    //spiral(clientsToTile, screenGeom);
+    var tyler = screenConfigs.getConfig(desktop, screen);
 
-    //wideMode(clientsToTile, screenGeom);
-    
-    tallMode(clientsToTile, screenGeom);
+    tyler.tile(clientsToTile, screenGeom);
 }
 
 function relayoutAll() {
@@ -326,6 +358,16 @@ registerShortcut("Move Window Down",
                               workspace.activeScreen);
                  });
 
+registerShortcut("Cycle Tiling Mode",
+                 "Cycle through tiling layouts",
+                 "Meta+Space",
+                 function() {
+                     screenConfigs.getConfig(workspace.currentDesktop,
+                                             workspace.activeScreen).cycleTiler();
+                     relayout(workspace.currentDesktop,
+                              workspace.activeScreen);
+                 });
+
 /**************** WORK-SPACE SIGNAL HANDLERS ****************/
 
 workspace.clientAdded.connect(function(client) {
@@ -355,5 +397,7 @@ workspace.clientUnminimized.connect(function(client) {
 var managedClients = new ClientList();
 managedClients.repopulateList();
 managedClients.printAllClients();
+
+var screenConfigs = new ConfigsList();
 
 relayoutAll();
