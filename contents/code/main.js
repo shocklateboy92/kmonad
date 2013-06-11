@@ -17,8 +17,8 @@ function ClientList() {
         for (desktop in __all_clients) {
             for (screen in __all_clients[desktop]) {
                 for (client in __all_clients[desktop][screen])
-                print("\t(" + desktop + "," + screen + "): '" +
-                      __all_clients[desktop][screen][client].caption + "'");
+                    print("\t(" + desktop + "," + screen + "): '" +
+                          __all_clients[desktop][screen][client].caption + "'");
             }
         }
     }
@@ -184,27 +184,27 @@ function ClientList() {
 /********************* TILING FUNCTIONS *********************/
 
 function spiral(clients, geom) {
-    if(clients.length === 0 ) {
-      return;
+    if (clients.length === 0 ) {
+        return;
     }
-    if(clients.length === 1) {
-      clients[0].geometry = geom;
-      return;
+    if (clients.length === 1) {
+        clients[0].geometry = geom;
+        return;
     }
-        var wnd = clients.shift();
-        
-            if (geom.width > geom.height) {
-                geom.width = (geom.width/2);
-                wnd.geometry = geom;
-                geom.x = geom.x + wnd.width;
-            } else {
-                geom.height = (geom.height/2);
-                wnd.geometry = geom;
-                geom.y = geom.y + wnd.height;
-            }
-        
-        spiral(clients,geom);
+    var wnd = clients.shift();
+
+    if (geom.width > geom.height) {
+        geom.width = (geom.width/2);
+        wnd.geometry = geom;
+        geom.x = geom.x + wnd.width;
+    } else {
+        geom.height = (geom.height/2);
+        wnd.geometry = geom;
+        geom.y = geom.y + wnd.height;
     }
+
+    spiral(clients,geom);
+}
 
 function stackHorizontally(clients, geom) {
     var width = geom.width / clients.length;
