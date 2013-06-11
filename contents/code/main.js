@@ -246,13 +246,15 @@ function ConfigsList() {
             stackVertically(mainList, {
                                 x: geom.x,
                                 y: geom.y,
-                                width: geom.width / 2,
+                                width: geom.width * this.primaryWindowSizeRatio,
                                 height: geom.height
                             });
             stackVertically(secondList, {
-                                x: geom.x + (geom.width / 2),
+                                x: geom.x + (geom.width *
+                                                this.primaryWindowSizeRatio),
                                 y: geom.y,
-                                width: geom.width / 2,
+                                width: geom.width *
+                                            (1 - this.primaryWindowSizeRatio),
                                 height: geom.height
                             });
         },
