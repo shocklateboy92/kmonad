@@ -202,7 +202,12 @@ function ConfigsList() {
             }
         }
 
-
+        this.offsetPrimaryWindowSizeRatio = function(offset) {
+            var newRatio = this.primaryWindowSizeRatio + offset;
+            if (0.1 < newRatio && newRatio < 0.9) {
+                this.primaryWindowSizeRatio = newRatio;
+            }
+        }
     }
 
     var __all_confs = [];
@@ -416,6 +421,28 @@ registerShortcut("Decrease Primary Windows",
                      screenConfigs.getConfig(workspace.currentDesktop,
                                              workspace.activeScreen)
                                              .offsetPrimaryWindows(-1);
+                     relayout(workspace.currentDesktop,
+                              workspace.activeScreen);
+                 });
+
+registerShortcut("Increase Primary Ratio",
+                 "Increase the primary window size ratio",
+                 "Meta+L",
+                 function() {
+                     screenConfigs.getConfig(workspace.currentDesktop,
+                                             workspace.activeScreen).
+                                             offsetPrimaryWindowSizeRatio(0.1);
+                     relayout(workspace.currentDesktop,
+                              workspace.activeScreen);
+                 });
+
+registerShortcut("Decrease Primary Ratio",
+                 "Decrease the primary window size ratio",
+                 "Meta+H",
+                 function() {
+                     screenConfigs.getConfig(workspace.currentDesktop,
+                                             workspace.activeScreen).
+                                             offsetPrimaryWindowSizeRatio(-0.1);
                      relayout(workspace.currentDesktop,
                               workspace.activeScreen);
                  });
