@@ -274,13 +274,16 @@ function ConfigsList() {
                                   x: geom.x,
                                   y: geom.y,
                                   width: geom.width,
-                                  height: geom.height / 2
+                                  height: geom.height *
+                                                    this.primaryWindowSizeRatio
                               });
             stackHorizontally(secondList, {
                                   x: geom.x,
-                                  y: geom.y + (geom.height / 2),
+                                  y: geom.y + (geom.height *
+                                               this.primaryWindowSizeRatio),
                                   width: geom.width,
-                                  height: geom.height / 2
+                                  height: geom.height *
+                                            (1 - this.primaryWindowSizeRatio)
                               });
 
         },
