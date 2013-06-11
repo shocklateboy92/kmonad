@@ -260,15 +260,22 @@ function ConfigsList() {
                 clients[0].geometry = geom;
                 return;
             }
-            var mainClient = clients.shift();
+            var mainList = clients.slice(0, this.primaryWindows);
+            var secondList = clients.slice(this.primaryWindows);
 
-            var mainGeom = geom;
-            mainGeom.height = geom.height / 2;
+            stackHorizontally(mainList, {
+                                  x: geom.x,
+                                  y: geom.y,
+                                  width: geom.width,
+                                  height: geom.height / 2
+                              });
+            stackHorizontally(secondList, {
+                                  x: geom.x,
+                                  y: geom.y + (geom.height / 2),
+                                  width: geom.width,
+                                  height: geom.height / 2
+                              });
 
-            mainClient.geometry = mainGeom;
-            mainGeom.y += mainGeom.height;
-
-            stackHorizontally(clients, mainGeom);
         },
         function fullScreen(clients, geom) {
             if (clients.length === 0) {
@@ -393,7 +400,7 @@ registerShortcut("Cycle Tiling Mode",
 
 registerShortcut("Increase Primary Windows",
                  "Increase Primary Windows",
-                 "Meta+L",
+                 "Meta+,",
                  function() {
                      screenConfigs.getConfig(workspace.currentDesktop,
                                              workspace.activeScreen)
@@ -402,9 +409,9 @@ registerShortcut("Increase Primary Windows",
                               workspace.activeScreen);
                  });
 
-registerShortcut("Increase Primary Windows",
+registerShortcut("Decrease Primary Windows",
                  "Decrease Primary Windows",
-                 "Meta+H",
+                 "Meta+.",
                  function() {
                      screenConfigs.getConfig(workspace.currentDesktop,
                                              workspace.activeScreen)
