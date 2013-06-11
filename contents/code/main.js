@@ -192,10 +192,17 @@ function ConfigsList() {
 
         this.cycleTiler = function() {
             var index = __tilers.indexOf(this.tile);
-            print("tyler was " + __tilers[index]);
             this.tile = __tilers[(index + 1) % __tilers.length];
-            print("tyler is " + this.tile);
         }
+
+        this.offsetPrimaryWindows = function(offset) {
+            var newoffset = this.primaryWindows+offset;
+            if (newoffset > 0) {
+                this.primaryWindows += offset;
+            }
+        }
+
+
     }
 
     var __all_confs = [];
@@ -218,6 +225,7 @@ function ConfigsList() {
 
     var __tilers = [
         function tallMode(clients, geom) {
+            print("PrimaryWindows: " + this.primaryWindows);
             if (clients.length === 0) {
                 return;
             }
@@ -226,17 +234,25 @@ function ConfigsList() {
                 return;
             }
 
-            var mainClient = clients.shift();
+            var mainList = clients.slice(0, this.primaryWindows);
+            var secondList = clients.slice(this.primaryWindows);
 
-            var mainGeom = geom;
-            mainGeom.width = geom.width / 2;
 
-            mainClient.geometry = mainGeom;
-            mainGeom.x += mainGeom.width;
-
-            stackVertically(clients, mainGeom);
+            stackVertically(mainList, {
+                                x: geom.x,
+                                y: geom.y,
+                                width: geom.width / 2,
+                                height: geom.height
+                            });
+            stackVertically(secondList, {
+                                x: geom.x + (geom.width / 2),
+                                y: geom.y,
+                                width: geom.width / 2,
+                                height: geom.height
+                            });
         },
         function wideMode(clients, geom) {
+            print("PrimaryWindows: " + this.primaryWindows);
             if (clients.length === 0) {
                 return;
             }
@@ -371,6 +387,28 @@ registerShortcut("Cycle Tiling Mode",
                  function() {
                      screenConfigs.getConfig(workspace.currentDesktop,
                                              workspace.activeScreen).cycleTiler();
+                     relayout(workspace.currentDesktop,
+                              workspace.activeScreen);
+                 });
+
+registerShortcut("Increase Primary Windows",
+                 "Increase Primary Windows",
+                 "Meta+L",
+                 function() {
+                     screenConfigs.getConfig(workspace.currentDesktop,
+                                             workspace.activeScreen)
+                                             .offsetPrimaryWindows(1);
+                     relayout(workspace.currentDesktop,
+                              workspace.activeScreen);
+                 });
+
+registerShortcut("Increase Primary Windows",
+                 "Decrease Primary Windows",
+                 "Meta+H",
+                 function() {
+                     screenConfigs.getConfig(workspace.currentDesktop,
+                                             workspace.activeScreen)
+                                             .offsetPrimaryWindows(-1);
                      relayout(workspace.currentDesktop,
                               workspace.activeScreen);
                  });
