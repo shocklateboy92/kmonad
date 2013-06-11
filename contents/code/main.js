@@ -254,6 +254,13 @@ function ConfigsList() {
 
             stackHorizontally(clients, mainGeom);
         },
+        function fullScreen(clients, geom) {
+            if (clients.length === 0) {
+                return;
+            }
+            clients[0].geometry = geom;
+            workspace.activeClient = clients[0];
+        },
         function spiral(clients, geom) {
             if (clients.length === 0 ) {
                 return;
