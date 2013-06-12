@@ -130,10 +130,7 @@ function ClientList() {
 
         for (i in clients) {
             var client = clients[i];
-
-            if (!client.minimized) {
                 newList.push(client);
-            }
         }
         return newList;
     }
@@ -447,10 +444,14 @@ workspace.clientRemoved.connect(function(client) {
 });
 
 workspace.clientMinimized.connect(function(client) {
+    print("Window '" + client.caption + "' minimized from workspace");
+    managedClients.removeClient(client);
     relayout(client.desktop, client.screen);
 });
 
 workspace.clientUnminimized.connect(function(client) {
+    print("Window '" + client.caption + "' unminimized to the workspace");
+    managedClients.addClient(client);
     relayout(client.desktop, client.screen);
 });
 
