@@ -28,12 +28,6 @@ function ClientList() {
             return true;
         }
 
-        //to avoid trying to tile minimized windows
-        if (pc.minimized) {
-            return true;
-        }
-
-
         // to avoid things like Yakuake
         if (pc.skipPager || pc.skipTaskbar) {
             return true;
@@ -43,7 +37,7 @@ function ClientList() {
     }
 
     this.addClient = function(pc) {
-        if (this.shouldIgnore(pc)) {
+        if (this.shouldIgnore(pc) || this.minimized) {
             print("Ignoring special window '" + pc.caption + "'");
             return;
         } else {
