@@ -293,29 +293,7 @@ function ConfigsList() {
             }
             clients[0].geometry = geom;
             workspace.activeClient = clients[0];
-        },
-        function spiral(clients, geom) {
-            if (clients.length === 0 ) {
-                return;
-            }
-            if (clients.length === 1) {
-                clients[0].geometry = geom;
-                return;
-            }
-            var wnd = clients.shift();
-
-            if (geom.width > geom.height) {
-                geom.width = (geom.width/2);
-                wnd.geometry = geom;
-                geom.x = geom.x + wnd.width;
-            } else {
-                geom.height = (geom.height/2);
-                wnd.geometry = geom;
-                geom.y = geom.y + wnd.height;
-            }
-
-            spiral(clients,geom);
-    }];
+        }];
 }
 
 // Helper functions
