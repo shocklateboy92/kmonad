@@ -28,6 +28,11 @@ function ClientList() {
             return true;
         }
 
+        //to avoid trying to tile minimized windows
+        if (pc.minimized) {
+            return true;
+        }
+
         // to avoid things like Yakuake
         if (pc.skipPager || pc.skipTaskbar) {
             return true;
