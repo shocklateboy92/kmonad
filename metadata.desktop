@@ -7,7 +7,7 @@ X-Plasma-API=javascript
 X-Plasma-MainScript=code/main.js
 
 X-KDE-PluginInfo-Author=Lasath Fernando & Elliott Lester
-X-KDE-PluginInfo-Email=devel@lasath.org & lester.elliott@gmail.com
+X-KDE-PluginInfo-Email=devel@lasath.org
 X-KDE-PluginInfo-Name=Kmonad
 X-KDE-PluginInfo-Version=0.1
 
