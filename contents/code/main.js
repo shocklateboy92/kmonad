@@ -33,6 +33,11 @@ function ClientList() {
             return true;
         }
 
+        // no point trying if we can't actually tile
+        if (!pc.resizeable || !pc.moveable) {
+            return true;
+        }
+
         return false;
     }
 
