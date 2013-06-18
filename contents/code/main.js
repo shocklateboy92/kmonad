@@ -42,7 +42,7 @@ function ClientList() {
     }
 
     this.addClient = function(pc) {
-        if (this.shouldIgnore(pc) || this.minimized) {
+        if (this.shouldIgnore(pc) || pc.minimized) {
             print("Ignoring special window '" + pc.caption + "'");
             return;
         } else {
