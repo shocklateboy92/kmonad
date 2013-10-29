@@ -59,6 +59,13 @@ function ClientList() {
 
                     if (index === -1) {
                         print("ERROR: client doesn't exist in previous screen!");
+
+                        // If it wasn't in the previous desktop, then we're not
+                        // really managing this window anymore. In which case,
+                        // just leave.
+                        this.prevDesktop = this.client.desktop;
+                        this.prevScreen  = this.client.screen;
+                        return;
                     } else {
                         prevList.splice(index, 1);
                     }
